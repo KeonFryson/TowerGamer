@@ -11,7 +11,7 @@ public class Enemy : MonoBehaviour
     [Header("Visual")]
     [SerializeField] private SpriteRenderer spriteRenderer;
 
-    private int currentWaypointIndex = 0;
+    private int currentNodeIndex = 0;
     private float currentHealth;
 
     private void Start()
@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
         if (PathManager.Instance != null && PathManager.Instance.GetWaypointCount() > 0)
         {
             transform.position = PathManager.Instance.GetWaypoint(0);
-            currentWaypointIndex = 1;
+            currentNodeIndex = 0;
         }
     }
 
@@ -37,21 +37,38 @@ public class Enemy : MonoBehaviour
 
     private void MoveAlongPath()
     {
-        if (PathManager.Instance == null || currentWaypointIndex >= PathManager.Instance.GetWaypointCount())
+        if (PathManager.Instance == null)
         {
             ReachEnd();
             return;
         }
 
-        Vector3 targetPosition = PathManager.Instance.GetWaypoint(currentWaypointIndex);
-        Vector3 direction = (targetPosition - transform.position).normalized;
+        PathNodeData currentNode = PathManager.Instance.GetNode(currentNodeIndex);
+        if (currentNode == null)
+        {
+            ReachEnd();
+            return;
+        }
 
+        Vector3 targetPosition = currentNode.position;
+        Vector3 direction = (targetPosition - transform.position).normalized;
         transform.position += direction * moveSpeed * Time.deltaTime;
 
-        // Check if reached waypoint
+        // Check if reached node
         if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
         {
-            currentWaypointIndex++;
+            // If there are next nodes, pick one (randomly)
+            if (currentNode.nextNodeIndices != null && currentNode.nextNodeIndices.Length > 0)
+            {
+                // Pick a random next node index
+                int nextIdx = currentNode.nextNodeIndices[Random.Range(0, currentNode.nextNodeIndices.Length)];
+                currentNodeIndex = nextIdx;
+            }
+            else
+            {
+                // No next node, reached end
+                ReachEnd();
+            }
         }
     }
 

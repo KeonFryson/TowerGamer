@@ -152,8 +152,15 @@ public class TowerPlacement : MonoBehaviour
 
     private bool IsValidPlacement(Vector3 position)
     {
-        Collider2D hit = Physics2D.OverlapCircle(position, 0.4f, blockingLayer);
-        return hit == null;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(position, 0.4f, blockingLayer);
+        foreach (var hit in hits)
+        {
+            if (currentPreview == null || hit.gameObject != currentPreview)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void TryPlaceTower()

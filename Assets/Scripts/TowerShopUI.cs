@@ -14,6 +14,7 @@ public class TowerShopUI : MonoBehaviour
     }
 
     [Header("Tower Buttons")]
+    [SerializeField] private GameObject TowerShopPanel;
     [SerializeField] private TowerButton[] towerButtons;
     [SerializeField] private TowerPlacement towerPlacement;
 
@@ -25,6 +26,7 @@ public class TowerShopUI : MonoBehaviour
         }
 
         SetupButtons();
+        TowerShopPanel.SetActive(false);
     }
 
     private void SetupButtons()
@@ -53,5 +55,16 @@ public class TowerShopUI : MonoBehaviour
         {
             towerPlacement.StartPlacingTower(towerPrefab);
         }
+    }
+
+    public void ToggleShop()
+    {
+        bool isActive = !TowerShopPanel.activeSelf;
+        OpenTowerShop(isActive);
+    }
+
+    private void OpenTowerShop(bool isOpen)
+    {
+        TowerShopPanel.SetActive(isOpen);
     }
 }

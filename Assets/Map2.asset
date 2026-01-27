@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a727577b3a03b304f94ee2ab578e3941, type: 3}
+  m_Name: Map2
+  m_EditorClassIdentifier: Assembly-CSharp::PathMapData
+  nodes:
+  - nodeName: 
+    position: {x: -37, y: 0, z: 0}
+    nextNodeIndices: 01000000
+  - nodeName: 
+    position: {x: -16, y: 0, z: 0}
+    nextNodeIndices: 0200000003000000
+  - nodeName: 
+    position: {x: -16, y: 4, z: 0}
+    nextNodeIndices: 05000000
+  - nodeName: 
+    position: {x: -16, y: -4, z: 0}
+    nextNodeIndices: 04000000
+  - nodeName: 
+    position: {x: 4, y: -4, z: 0}
+    nextNodeIndices: 06000000
+  - nodeName: 
+    position: {x: 4, y: 4, z: 0}
+    nextNodeIndices: 06000000
+  - nodeName: 
+    position: {x: 4.06, y: 0.04, z: 0}
+    nextNodeIndices: 07000000
+  - nodeName: 
+    position: {x: 37.9, y: 0.04, z: 0}
+    nextNodeIndices: 
