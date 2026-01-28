@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5195436084199092067}
   - component: {fileID: 7701841139636765560}
   - component: {fileID: 7130802125073428021}
+  - component: {fileID: 4607913974503557605}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -61,6 +62,16 @@ MonoBehaviour:
   OnGameOver:
     m_PersistentCalls:
       m_Calls: []
+  gameSpeeds:
+  - 1
+  - 2
+  - 4
+  OnGameSpeedChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPauseStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &5195436084199092067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73,10 +84,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 148ce1b5b148aff4ab2ec68e0e8a498b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  enemyPrefab: {fileID: 2564765092523535564, guid: 4a745c43538d1404b9058d269df21229, type: 3}
+  enemyPrefabs: []
   timeBetweenWaves: 5
   timeBetweenEnemies: 0.5
-  baseEnemiesPerWave: 5
+  baseEnemiesPerWave: 2
   enemyIncreasePerWave: 1.5
 --- !u!114 &7701841139636765560
 MonoBehaviour:
@@ -113,6 +124,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c498c958f4bf5cd459fbba4906a75a06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PathManager
-  pathMapData: {fileID: 11400000, guid: a5c46f6a6b3b02f4db2515f6c1b18617, type: 2}
-  pathColor: {r: 0, g: 1, b: 1, a: 1}
+  pathMapData: {fileID: 11400000, guid: 294bad30db0869248b505fb5704903a6, type: 2}
+  pathColor: {r: 0, g: 0.7322817, b: 1, a: 1}
   showPath: 1
+--- !u!114 &4607913974503557605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361061165515505607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ae70c5ef540fee4b998388ef156f8c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerSelector
+  towerDataPanelUI: {fileID: 0}

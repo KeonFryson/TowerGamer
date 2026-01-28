@@ -90,6 +90,7 @@ public class CameraMovement : MonoBehaviour
         HandleZoom();
     }
 
+
     private void HandleKeyboardMovement()
     {
         // WASD movement
@@ -111,7 +112,7 @@ public class CameraMovement : MonoBehaviour
         float currentSpeed = Keyboard.current.leftShiftKey.isPressed ? fastMoveSpeed : moveSpeed;
 
         // Move camera rig in 2D space
-        Vector3 newPosition = cameraTransform.position + moveDirection * currentSpeed * Time.deltaTime;
+        Vector3 newPosition = cameraTransform.position + moveDirection * currentSpeed * Time.unscaledDeltaTime;
         cameraTransform.position = ClampPositionToBounds(newPosition);
     }
 
@@ -136,7 +137,7 @@ public class CameraMovement : MonoBehaviour
 
         if (edgeMove != Vector3.zero)
         {
-            Vector3 newPosition = cameraTransform.position + edgeMove * edgeScrollSpeed * Time.deltaTime;
+            Vector3 newPosition = cameraTransform.position + edgeMove * edgeScrollSpeed * Time.unscaledDeltaTime;
             cameraTransform.position = ClampPositionToBounds(newPosition);
         }
     }
@@ -183,7 +184,7 @@ public class CameraMovement : MonoBehaviour
 
         if (Mathf.Abs(scroll) > 0.01f)
         {
-            float newSize = virtualCamera.Lens.OrthographicSize - scroll * zoomSpeed * Time.deltaTime;
+            float newSize = virtualCamera.Lens.OrthographicSize - scroll * zoomSpeed * Time.unscaledDeltaTime;
             virtualCamera.Lens.OrthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
         }
     }

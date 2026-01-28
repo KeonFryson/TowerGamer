@@ -8,7 +8,6 @@ public class TowerShopUI : MonoBehaviour
     public class TowerButton
     {
         public GameObject towerPrefab;
-        // Removed iconSprite and towerName fields
     }
 
     [Header("Tower Buttons")]
@@ -19,6 +18,16 @@ public class TowerShopUI : MonoBehaviour
     [SerializeField] private GameObject buttonTemplate; // Assign your TowerButton prefab in the inspector
     [SerializeField] private Transform buttonParent;    // Assign the parent container for buttons
 
+    // Store references to buy buttons and their costs for updating
+    private struct ButtonData
+    {
+        public Button buyButton;
+        public int cost;
+        public GameObject towerPrefab;
+        public GameObject buttonObj;
+    }
+    private ButtonData[] buttonDataArray;
+
     private void Start()
     {
         if (towerPlacement == null)
@@ -28,6 +37,12 @@ public class TowerShopUI : MonoBehaviour
 
         SetupButtons();
         TowerShopPanel.SetActive(false);
+
+        // Subscribe to money changed event
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnMoneyChanged.AddListener(OnMoneyChanged);
+        }
     }
 
     private void SetupButtons()
@@ -38,8 +53,11 @@ public class TowerShopUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (TowerButton towerButton in towerButtons)
+        buttonDataArray = new ButtonData[towerButtons.Length];
+
+        for (int i = 0; i < towerButtons.Length; i++)
         {
+            TowerButton towerButton = towerButtons[i];
             if (towerButton.towerPrefab != null)
             {
                 GameObject buttonObj = Instantiate(buttonTemplate, buttonParent);
@@ -50,8 +68,6 @@ public class TowerShopUI : MonoBehaviour
                 Button buyButton = buttonObj.transform.Find("Button").GetComponent<Button>();
                 TextMeshProUGUI costText = buttonObj.transform.Find("Button/BuyButton").GetComponent<TextMeshProUGUI>();
 
-               
-
                 Tower tower = towerButton.towerPrefab.GetComponent<Tower>();
                 int cost = tower != null ? tower.GetCost() : 0;
 
@@ -60,14 +76,14 @@ public class TowerShopUI : MonoBehaviour
 
                 // Get sprite from towerPrefab
                 Sprite sprite = null;
-                SpriteRenderer sr = towerButton.towerPrefab.GetComponent<SpriteRenderer>();
+                SpriteRenderer sr = towerButton.towerPrefab.GetComponentInChildren<SpriteRenderer>();
                 if (sr != null)
                 {
                     sprite = sr.sprite;
                 }
                 else
                 {
-                    Image img = towerButton.towerPrefab.GetComponent<Image>();
+                    Image img = towerButton.towerPrefab.GetComponentInChildren<Image>();
                     if (img != null)
                     {
                         sprite = img.sprite;
@@ -88,17 +104,64 @@ public class TowerShopUI : MonoBehaviour
                 }
 
                 GameObject prefab = towerButton.towerPrefab;
-                buyButton.onClick.AddListener(() => OnTowerButtonClicked(prefab));
+                int capturedIndex = i;
+                buyButton.onClick.AddListener(() => OnTowerButtonClicked(prefab, cost));
 
+                buttonDataArray[i] = new ButtonData
+                {
+                    buyButton = buyButton,
+                    cost = cost,
+                    towerPrefab = prefab,
+                    buttonObj = buttonObj
+                };
+            }
+        }
+
+        // Initial update
+        OnMoneyChanged(GameManager.Instance != null ? GameManager.Instance.GetMoney() : 0);
+    }
+
+    private void OnTowerButtonClicked(GameObject towerPrefab, int cost)
+    {
+        if (GameManager.Instance != null && GameManager.Instance.GetMoney() >= cost)
+        {
+            if (towerPlacement != null)
+            {
+                towerPlacement.StartPlacingTower(towerPrefab, cost);
             }
         }
     }
 
-    private void OnTowerButtonClicked(GameObject towerPrefab)
+    // Called when money changes
+    private void OnMoneyChanged(int currentMoney)
     {
-        if (towerPlacement != null)
+        if (buttonDataArray == null) return;
+
+        foreach (var data in buttonDataArray)
         {
-            towerPlacement.StartPlacingTower(towerPrefab);
+            if (data.buyButton != null)
+            {
+                bool canAfford = currentMoney >= data.cost;
+                data.buyButton.interactable = canAfford;
+
+                // Optional: visually gray out the buttonObj if not interactable
+                CanvasGroup cg = data.buttonObj.GetComponent<CanvasGroup>();
+                if (cg == null)
+                {
+                    cg = data.buttonObj.AddComponent<CanvasGroup>();
+                }
+                cg.alpha = canAfford ? 1f : 0.5f;
+            }
+        }
+
+        // If currently placing a tower, cancel if not enough money
+        if (towerPlacement != null && towerPlacement.IsPlacingTower)
+        {
+            int placingCost = towerPlacement.CurrentPlacingCost;
+            if (currentMoney < placingCost)
+            {
+                towerPlacement.CancelPlacement();
+            }
         }
     }
 

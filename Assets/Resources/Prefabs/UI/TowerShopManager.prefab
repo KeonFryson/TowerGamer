@@ -46,7 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerShopUI
   TowerShopPanel: {fileID: 0}
   towerButtons:
-  - towerPrefab: {fileID: 3194907397730433603, guid: c3857246b8377774389f6b851e200c6c, type: 3}
   - towerPrefab: {fileID: 5773805278147299793, guid: 701a4139ba10e3744baef0d7c2e544e1, type: 3}
   towerPlacement: {fileID: 0}
   buttonTemplate: {fileID: 7682040028272405222, guid: d3a313348167fb741a4f46d37ec96fed, type: 3}

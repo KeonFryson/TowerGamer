@@ -249,8 +249,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40589169b43b30b41bf29f5214b53d0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraMovement
-  virtualCamera: {fileID: 1100094285857868223}
-  confiner: {fileID: 2646604026377418319}
+  virtualCamera: {fileID: 0}
+  confiner: {fileID: 0}
   moveSpeed: 20
   fastMoveSpeed: 40
   edgeScrollSpeed: 15

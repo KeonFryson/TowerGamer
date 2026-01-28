@@ -18,12 +18,16 @@ public class GameManager : MonoBehaviour
     public UnityEvent<int> OnWaveChanged;
     public UnityEvent OnGameOver;
 
-    // --- Add for time scale ---
     [Header("Game Speed")]
     [SerializeField] private float[] gameSpeeds = { 1f, 2f, 4f };
     private int currentSpeedIndex = 0;
     public UnityEvent<float> OnGameSpeedChanged;
-    // --------------------------
+
+    // --- Pause Support ---
+    private bool isPaused = false;
+    private float previousTimeScale = 1f;
+    public UnityEvent<bool> OnPauseStateChanged;
+    // ---------------------
 
     private void Awake()
     {
@@ -107,16 +111,62 @@ public class GameManager : MonoBehaviour
     // --- Game Speed Methods ---
     public void SetGameSpeed(int speedIndex)
     {
+        if (isPaused)
+        {
+            currentSpeedIndex = speedIndex;
+            return;
+        }
+
         if (speedIndex < 0 || speedIndex >= gameSpeeds.Length)
             return;
 
         currentSpeedIndex = speedIndex;
         Time.timeScale = gameSpeeds[speedIndex];
+        previousTimeScale = gameSpeeds[speedIndex];
         OnGameSpeedChanged?.Invoke(gameSpeeds[speedIndex]);
     }
 
     public float GetCurrentGameSpeed()
     {
         return gameSpeeds[currentSpeedIndex];
+    }
+
+    // --- Pause Methods ---
+    public void TogglePause()
+    {
+        if (isPaused)
+        {
+            ResumeGame();
+        }
+        else
+        {
+            PauseGame();
+        }
+    }
+
+    public void PauseGame()
+    {
+        if (!isPaused)
+        {
+            isPaused = true;
+            previousTimeScale = Time.timeScale;
+            Time.timeScale = 0f;
+            OnPauseStateChanged?.Invoke(true);
+        }
+    }
+
+    public void ResumeGame()
+    {
+        if (isPaused)
+        {
+            isPaused = false;
+            Time.timeScale = gameSpeeds[currentSpeedIndex];
+            OnPauseStateChanged?.Invoke(false);
+        }
+    }
+
+    public bool IsPaused()
+    {
+        return isPaused;
     }
 }

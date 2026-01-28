@@ -19,6 +19,11 @@ public class TowerPlacement : MonoBehaviour
     private GameObject currentPreview;
     private SpriteRenderer previewRenderer;
     private GameObject rangeIndicator;
+    private int currentMoney;
+
+    // Track cost of currently placing tower
+    public int CurrentPlacingCost { get; private set; }
+    public bool IsPlacingTower => isPlacingTower;
 
     private void Start()
     {
@@ -30,6 +35,17 @@ public class TowerPlacement : MonoBehaviour
         if (isPlacingTower)
         {
             UpdatePlacementPreview();
+
+            if (GameManager.Instance != null)
+            {
+                currentMoney = GameManager.Instance.GetMoney();
+                // Cancel placement if not enough money
+                if (currentMoney < CurrentPlacingCost)
+                {
+                    CancelPlacement();
+                    return;
+                }
+            }
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
@@ -43,7 +59,8 @@ public class TowerPlacement : MonoBehaviour
         }
     }
 
-    public void StartPlacingTower(GameObject tower)
+    // Overload to accept cost
+    public void StartPlacingTower(GameObject tower, int cost)
     {
         // Cancel any existing placement
         if (isPlacingTower)
@@ -53,6 +70,7 @@ public class TowerPlacement : MonoBehaviour
 
         towerPrefab = tower;
         isPlacingTower = true;
+        CurrentPlacingCost = cost;
 
         // Create preview
         if (placementPreview != null)
@@ -74,6 +92,14 @@ public class TowerPlacement : MonoBehaviour
 
         // Create range indicator
         CreateRangeIndicator();
+    }
+
+    // For backward compatibility
+    public void StartPlacingTower(GameObject tower)
+    {
+        Tower towerComponent = tower != null ? tower.GetComponent<Tower>() : null;
+        int cost = towerComponent != null ? towerComponent.GetCost() : 0;
+        StartPlacingTower(tower, cost);
     }
 
     private void CreateRangeIndicator()
@@ -174,18 +200,27 @@ public class TowerPlacement : MonoBehaviour
             Tower tower = towerPrefab.GetComponent<Tower>();
             int cost = tower != null ? tower.GetCost() : 0;
 
-            if (GameManager.Instance != null && GameManager.Instance.SpendMoney(cost))
+            if (GameManager.Instance != null && GameManager.Instance.GetMoney() >= cost && GameManager.Instance.SpendMoney(cost))
             {
-                Instantiate(towerPrefab, placementPos, Quaternion.identity);
-                // Don't cancel placement - allow placing multiple towers
-                // CancelPlacement();
+                var newTowerObj = Instantiate(towerPrefab, placementPos, Quaternion.identity);
+                Tower newTower = newTowerObj.GetComponent<Tower>();
+                if (newTower != null)
+                {
+                    newTower.MarkAsPlaced();
+                }
+            }
+            else
+            {
+                // Not enough money, cancel placement
+                CancelPlacement();
             }
         }
     }
 
-    private void CancelPlacement()
+    public void CancelPlacement()
     {
         isPlacingTower = false;
+        CurrentPlacingCost = 0;
         if (currentPreview != null)
         {
             Destroy(currentPreview);
