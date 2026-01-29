@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class TowerUpgrade
@@ -45,6 +46,7 @@ public class Tower : MonoBehaviour
 
     private float fireTimer = 0f;
     private Enemy currentTarget;
+    private LineRenderer rangeLineRenderer;
     public bool IsPlaced { get; private set; } = false;
 
     public void MarkAsPlaced()
@@ -252,11 +254,7 @@ public class Tower : MonoBehaviour
             spriteRenderer.sprite = upgrade.icon;
         }
 
-        // Optionally update the name (if you want the tower's name to change)
-        if (!string.IsNullOrEmpty(upgrade.upgradeName))
-        {
-            gameObject.name = upgrade.upgradeName;
-        }
+ 
 
         upgradeTiers[path]++;
         return true;
@@ -282,32 +280,40 @@ public class Tower : MonoBehaviour
         if (rangeIndicator != null) return;
 
         rangeIndicator = new GameObject("RangeIndicator");
-        var lineRenderer = rangeIndicator.AddComponent<LineRenderer>();
+        rangeLineRenderer = rangeIndicator.AddComponent<LineRenderer>();
 
-        lineRenderer.useWorldSpace = false;
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
-        lineRenderer.startColor = new Color(1f, 1f, 1f, 0.5f);
-        lineRenderer.endColor = new Color(1f, 1f, 1f, 0.5f);
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.sortingOrder = -1;
+        rangeLineRenderer.useWorldSpace = false;
+        rangeLineRenderer.startWidth = 0.1f;
+        rangeLineRenderer.endWidth = 0.1f;
+        rangeLineRenderer.startColor = new Color(1f, 1f, 1f, 0.5f);
+        rangeLineRenderer.endColor = new Color(1f, 1f, 1f, 0.5f);
+        rangeLineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        rangeLineRenderer.sortingOrder = 0;
 
+        rangeIndicator.transform.SetParent(transform);
+        rangeIndicator.transform.localPosition = Vector3.zero;
+
+        UpdateRangeIndicator();
+    }
+
+    public void UpdateRangeIndicator()
+    {
+        if (rangeLineRenderer == null) return;
         int segments = 64;
-        lineRenderer.positionCount = segments + 1;
-        float range = GetRange();
+        rangeLineRenderer.positionCount = segments + 1;
+        float r = GetRange();
         float angle = 0f;
 
         for (int i = 0; i <= segments; i++)
         {
-            float x = Mathf.Sin(Mathf.Deg2Rad * angle) * range;
-            float y = Mathf.Cos(Mathf.Deg2Rad * angle) * range;
-            lineRenderer.SetPosition(i, new Vector3(x, y, 0f));
+            float x = Mathf.Sin(Mathf.Deg2Rad * angle) * r;
+            float y = Mathf.Cos(Mathf.Deg2Rad * angle) * r;
+            rangeLineRenderer.SetPosition(i, new Vector3(x, y, 0f));
             angle += 360f / segments;
         }
 
-        rangeIndicator.transform.SetParent(transform);
-        rangeIndicator.transform.localPosition = Vector3.zero;
     }
+
 
     public void HideRangeIndicator()
     {
@@ -316,5 +322,22 @@ public class Tower : MonoBehaviour
             Destroy(rangeIndicator);
             rangeIndicator = null;
         }
+    }
+
+   public int GetSellPrice()
+    {
+        int totalSpent = cost;
+        for (int path = 0; path < upgradeTiers.Length; path++)
+        {
+            for (int tier = 0; tier < upgradeTiers[path]; tier++)
+            {
+                TowerUpgrade upgrade = upgradePaths[path].upgrades[tier];
+                if (upgrade != null)
+                {
+                    totalSpent += upgrade.cost;
+                }
+            }
+        }
+        return totalSpent / 2; // Sell for half the total spent
     }
 }

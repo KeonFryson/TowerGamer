@@ -177,27 +177,27 @@ MonoBehaviour:
   maxPathLevels: 050000000500000005000000
   upgradePaths:
   - upgrades:
-    - upgradeName: Path1_Upgrade1
-      description: 
+    - upgradeName: Range
+      description: UpgradeRange by 2
       cost: 300
       icon: {fileID: 0}
-      rangeBonus: 1
-      fireRateBonus: 1
-      damageBonus: 1
-    - upgradeName: Path1_Upgrade2
-      description: 
+      rangeBonus: 2
+      fireRateBonus: 0
+      damageBonus: 0
+    - upgradeName: More Shots
+      description: Add More Stones
       cost: 400
       icon: {fileID: 0}
-      rangeBonus: 2
+      rangeBonus: 0
       fireRateBonus: 2
-      damageBonus: 2
-    - upgradeName: Path1_Upgrade3
+      damageBonus: 0
+    - upgradeName: All Stats Upgrade
       description: 
       cost: 500
       icon: {fileID: -7846892096075038837, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
       rangeBonus: 3
       fireRateBonus: 3
-      damageBonus: 3
+      damageBonus: 3.05
     - upgradeName: Path1_Upgrade4
       description: 
       cost: 500
@@ -223,14 +223,14 @@ MonoBehaviour:
     - upgradeName: Path3_Upgrade3
       description: 
       cost: 500
-      icon: {fileID: -7846892096075038837, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
+      icon: {fileID: -4436009720956083870, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
       rangeBonus: 3
       fireRateBonus: 3
       damageBonus: 3
     - upgradeName: Path4_Upgrade4
       description: 
       cost: 500
-      icon: {fileID: -7846892096075038837, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
+      icon: {fileID: 7364225122225125127, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
       rangeBonus: 3
       fireRateBonus: 3
       damageBonus: 3
@@ -252,14 +252,14 @@ MonoBehaviour:
     - upgradeName: Path4_Upgrade3
       description: 
       cost: 500
-      icon: {fileID: -7846892096075038837, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
+      icon: {fileID: 8824793825499218426, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
       rangeBonus: 3
       fireRateBonus: 3
       damageBonus: 3
     - upgradeName: Path4_Upgrade4
       description: 
       cost: 500
-      icon: {fileID: -7846892096075038837, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
+      icon: {fileID: -2955211545275086457, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
       rangeBonus: 3
       fireRateBonus: 3
       damageBonus: 3

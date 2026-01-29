@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba9b2f6d4280a744481ec342525251a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  startingMoney: 650
+  startingMoney: 65000
   startingLives: 100
   OnMoneyChanged:
     m_PersistentCalls:
@@ -140,3 +140,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerSelector
   towerDataPanelUI: {fileID: 0}
+  towerLayerMask:
+    serializedVersion: 2
+    m_Bits: 128

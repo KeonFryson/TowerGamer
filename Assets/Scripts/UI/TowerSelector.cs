@@ -19,6 +19,13 @@ public class TowerSelector : MonoBehaviour
 
     private void Update()
     {
+
+        if (selectedTower != null)
+        {
+            selectedTower.UpdateRangeIndicator();
+        }
+
+
         // Use new Input System for mouse click
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && !EventSystem.current.IsPointerOverGameObject())
         {
@@ -52,6 +59,15 @@ public class TowerSelector : MonoBehaviour
                 selectedTower = null;
             }
             towerDataPanelUI.Hide();
+        }
+
+        if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame && ! EventSystem.current.IsPointerOverGameObject())
+        {
+            if (selectedTower != null)
+            {
+                selectedTower.HideRangeIndicator();
+                selectedTower = null;
+            }
         }
     }
 }

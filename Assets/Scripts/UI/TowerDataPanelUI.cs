@@ -12,7 +12,24 @@ public class TowerDataPanelUI : MonoBehaviour
     [SerializeField] private TMP_Dropdown targetingDropdown;
     [SerializeField] private Transform upgradeButtonsParent; // Should have 3 children: Upgrade1, Upgrade2, Upgrade3
     [SerializeField] private Sprite[] upgradeBarSprites; // Assign Green_1, Green2, Green_3, Green_end, Green_Full in order
+    [SerializeField] private Button SellButton;
+    [SerializeField] private TextMeshProUGUI SellPrice;
+
     private Tower currentTower;
+    private int sellAmount;
+
+
+    private void Start()
+    {
+       
+        // Setup Sell button
+        if (SellButton != null)
+        {
+            SellButton.onClick.AddListener(OnSellButtonPressed);
+        }
+
+
+    }
 
     private void Update()
     {
@@ -20,6 +37,19 @@ public class TowerDataPanelUI : MonoBehaviour
         if (panel.activeSelf && currentTower != null)
         {
             ShowTowerData(currentTower);
+        }
+
+        if(currentTower == null)
+        {
+            Hide();
+        }
+        else
+        {
+            sellAmount = currentTower.GetSellPrice();
+            if (SellPrice != null)
+            {
+                SellPrice.text = $"${sellAmount}";
+            }
         }
     }
 
@@ -33,7 +63,7 @@ public class TowerDataPanelUI : MonoBehaviour
         string displayName = tower.name.Replace("(Clone)", "").Trim();
         nameText.text = displayName;
         spriteImage.sprite = tower.GetComponentInChildren<SpriteRenderer>().sprite;
-
+         
         // Setup upgrade buttons for 3 paths
         for (int path = 0; path < 3; path++)
         {
@@ -43,6 +73,7 @@ public class TowerDataPanelUI : MonoBehaviour
             Image upgradeIcon = upgradeButtonGroup.Find("UpgradeNumberImage").GetComponent<Image>();
 
             TowerUpgrade nextUpgrade = tower.GetNextUpgrade(path);
+
 
 
             // Setup targeting dropdown
@@ -103,6 +134,18 @@ public class TowerDataPanelUI : MonoBehaviour
             }
 
 
+        }
+    }
+
+
+    public void OnSellButtonPressed()
+    {
+        if (currentTower != null)
+        {
+            
+            GameManager.Instance.AddMoney(sellAmount);
+            Destroy(currentTower.gameObject);
+            Hide();
         }
     }
 

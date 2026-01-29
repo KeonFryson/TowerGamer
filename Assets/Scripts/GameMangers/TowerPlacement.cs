@@ -118,7 +118,7 @@ public class TowerPlacement : MonoBehaviour
         lineRenderer.startColor = new Color(1f, 1f, 1f, 0.5f);
         lineRenderer.endColor = new Color(1f, 1f, 1f, 0.5f);
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.sortingOrder = -1;
+        lineRenderer.sortingOrder = 0;
 
         // Draw circle
         int segments = 64;
