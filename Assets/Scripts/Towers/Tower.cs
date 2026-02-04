@@ -3,27 +3,32 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [System.Serializable]
-public class TowerUpgrade
+ public class TowerUpgrade
 {
     public string upgradeName;
     public string description;
     public int cost;
     public Sprite icon;
 
-    // Example stat bonuses (customize as needed)
+    // Stat bonuses
     public float rangeBonus;
     public float fireRateBonus;
     public float damageBonus;
+    public int projectilesPerShotBonus; // New: bonus projectiles per shot
+    public float spreadAngleBonus; // New: bonus spread angle
 }
 
- 
 public class Tower : MonoBehaviour
 {
     [Header("Tower Stats")]
     [SerializeField] private float range = 5f;
-    [SerializeField] private float fireRate = 1f;
+    [SerializeField] private float baseFireRate = 1f; // Renamed for clarity
+    [SerializeField] private float fireRateBonus = 0f; // New: total bonus from upgrades
     [SerializeField] private float damage = 1f;
     [SerializeField] private int cost = 100;
+    [SerializeField] private int baseProjectilesPerShot = 1; // New: base projectiles per shot
+    private int projectilesPerShotBonus = 0; // New: bonus from upgrades
+    [SerializeField] private float spreadAngle = 30f;
 
     [Header("Upgrade System")]
     [Tooltip("Current tier for each path (e.g., [2,1,0] means path 0 is tier 2, path 1 is tier 1, path 2 is tier 0)")]
@@ -34,7 +39,7 @@ public class Tower : MonoBehaviour
     public TowerUpgradePath[] upgradePaths = new TowerUpgradePath[3];
 
     [Header("Targeting")]
-    public TargetMode targetMode = TargetMode.First;
+    public TargetMode targetMode = TargetMode.Close;
 
     [Header("Visual")]
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -72,12 +77,17 @@ public class Tower : MonoBehaviour
     {
         fireTimer += Time.deltaTime;
 
-        if (fireTimer >= 1f / fireRate)
+        float effectiveFireRate = baseFireRate + fireRateBonus;
+        if (effectiveFireRate < 0.1f) effectiveFireRate = 0.1f; // Prevent divide by zero or negative
+
+        if (fireTimer >= 1f / effectiveFireRate)
         {
             FindAndAttackTarget();
             fireTimer = 0f;
         }
     }
+
+    
 
     private void FindAndAttackTarget()
     {
@@ -101,47 +111,52 @@ public class Tower : MonoBehaviour
 
     private Enemy SelectTarget(List<Enemy> enemies)
     {
+        if (enemies == null || enemies.Count == 0)
+            return null;
+
         switch (targetMode)
         {
             case TargetMode.First:
-                return enemies[0];
-            case TargetMode.Last:
+                // Assuming "First" means the enemy furthest along the path (highest progress)
                 return enemies[enemies.Count - 1];
+            case TargetMode.Last:
+                // Assuming "Last" means the enemy least progressed (lowest progress)
+                return enemies[0];
             case TargetMode.Close:
                 Enemy closest = enemies[0];
                 float closestDist = Vector3.Distance(transform.position, closest.GetPosition());
-                foreach (Enemy enemy in enemies)
+                for (int i = 1; i < enemies.Count; i++)
                 {
-                    float dist = Vector3.Distance(transform.position, enemy.GetPosition());
+                    float dist = Vector3.Distance(transform.position, enemies[i].GetPosition());
                     if (dist < closestDist)
                     {
-                        closest = enemy;
+                        closest = enemies[i];
                         closestDist = dist;
                     }
                 }
                 return closest;
             case TargetMode.Strong:
                 Enemy strongest = enemies[0];
-                foreach (Enemy enemy in enemies)
+                for (int i = 1; i < enemies.Count; i++)
                 {
-                    if ((int)enemy.Tier > (int)strongest.Tier)
+                    if ((int)enemies[i].Tier > (int)strongest.Tier)
                     {
-                        strongest = enemy;
+                        strongest = enemies[i];
                     }
                 }
                 return strongest;
             case TargetMode.Weak:
                 Enemy weakest = enemies[0];
-                foreach (Enemy enemy in enemies)
+                for (int i = 1; i < enemies.Count; i++)
                 {
-                    if ((int)enemy.Tier < (int)weakest.Tier)
+                    if ((int)enemies[i].Tier < (int)weakest.Tier)
                     {
-                        weakest = enemy;
+                        weakest = enemies[i];
                     }
                 }
                 return weakest;
             default:
-                return enemies[0];
+                return enemies[enemies.Count - 1];
         }
     }
 
@@ -149,13 +164,37 @@ public class Tower : MonoBehaviour
     {
         if (target == null) return;
 
+        int totalProjectiles = baseProjectilesPerShot + projectilesPerShotBonus;
+        if (totalProjectiles < 1) totalProjectiles = 1;
+
         if (projectilePrefab != null && projectileSpawnPoint != null)
         {
-            GameObject projectile = Instantiate(projectilePrefab, projectileSpawnPoint.position, Quaternion.identity);
-            Projectile proj = projectile.GetComponent<Projectile>();
-            if (proj != null)
+            float angleStep = totalProjectiles > 1 ? spreadAngle / (totalProjectiles - 1) : 0f;
+            float startAngle = -spreadAngle / 2f;
+
+            Vector3 toTarget = (target.GetPosition() - projectileSpawnPoint.position).normalized;
+
+            for (int i = 0; i < totalProjectiles; i++)
             {
-                proj.SetTarget(target, damage);
+                float angle = startAngle + i * angleStep;
+                Quaternion spreadRot = Quaternion.AngleAxis(angle, Vector3.forward);
+                Vector3 direction = spreadRot * toTarget;
+
+                // --- Aim Assist: Snap direction to target if within 0.1 units ---
+                float aimAssistThreshold = 0.1f;
+                Vector3 exactToTarget = (target.GetPosition() - projectileSpawnPoint.position).normalized;
+                if (Vector3.Distance(direction, exactToTarget) <= aimAssistThreshold)
+                {
+                    direction = exactToTarget;
+                }
+
+                GameObject projectile = Instantiate(projectilePrefab, projectileSpawnPoint.position, Quaternion.identity);
+                Projectile proj = projectile.GetComponent<Projectile>();
+                if (proj != null)
+                {
+                    proj.SetTarget(target, damage, false);
+                    proj.SetInitialDirection(direction);
+                }
             }
         }
         else
@@ -245,8 +284,10 @@ public class Tower : MonoBehaviour
 
         // Apply stat bonuses
         range += upgrade.rangeBonus;
-        fireRate += upgrade.fireRateBonus;
+        fireRateBonus += upgrade.fireRateBonus; // Now accumulates bonus
         damage += upgrade.damageBonus;
+        projectilesPerShotBonus += upgrade.projectilesPerShotBonus; // New: accumulate bonus
+        spreadAngle += upgrade.spreadAngleBonus; // New: accumulate bonus
 
         // Apply icon if provided
         if (upgrade.icon != null && spriteRenderer != null)
@@ -254,11 +295,10 @@ public class Tower : MonoBehaviour
             spriteRenderer.sprite = upgrade.icon;
         }
 
- 
-
         upgradeTiers[path]++;
         return true;
     }
+
 
     public int GetCost()
     {

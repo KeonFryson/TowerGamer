@@ -88,6 +88,7 @@ public class TowerDataPanelUI : MonoBehaviour
                 {
                     tower.targetMode = (Tower.TargetMode)idx;
                 });
+
             }
 
             // Set the upgrade bar image based on the current tier

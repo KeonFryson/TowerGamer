@@ -4,17 +4,21 @@ using TMPro;
 
 public class GameSpeedButtons : MonoBehaviour
 {
-    //[SerializeField] private Button speed1xButton;
-    [SerializeField] private Button speed2xButton;
-    [SerializeField] private Button speed3xButton;
+    [SerializeField] private Button speedButton;
+    [SerializeField] private TextMeshProUGUI speedButtonText;
     [SerializeField] private Button pauseButton;
     [SerializeField] private TextMeshProUGUI pauseButtonText;
 
+    private readonly int[] speedIndices = { 0, 1, 2 }; // 0: 1x, 1: 2x, 2: 3x
+    private int currentSpeedIndex = 0;
+
     private void Start()
     {
-        //speed1xButton.onClick.AddListener(() => SetSpeed(0));
-        speed2xButton.onClick.AddListener(() => SetSpeed(1));
-        speed3xButton.onClick.AddListener(() => SetSpeed(2));
+        if (speedButton != null)
+        {
+            speedButton.onClick.AddListener(CycleSpeed);
+        }
+
         if (pauseButton != null)
         {
             pauseButton.onClick.AddListener(TogglePause);
@@ -31,6 +35,15 @@ public class GameSpeedButtons : MonoBehaviour
             // Fallback: set initial text
             UpdatePauseButtonText(false);
         }
+
+        UpdateSpeedButtonText();
+    }
+
+    private void CycleSpeed()
+    {
+        currentSpeedIndex = (currentSpeedIndex + 1) % speedIndices.Length;
+        SetSpeed(currentSpeedIndex);
+        UpdateSpeedButtonText();
     }
 
     private void SetSpeed(int index)
@@ -38,6 +51,21 @@ public class GameSpeedButtons : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.SetGameSpeed(index);
+        }
+    }
+
+    private void UpdateSpeedButtonText()
+    {
+        if (speedButtonText != null)
+        {
+            string speedLabel = speedIndices[currentSpeedIndex] switch
+            {
+                0 => ">",
+                1 => ">>",
+                2 => ">>>",
+                _ => ">"
+            };
+            speedButtonText.text = speedLabel;
         }
     }
 
@@ -53,7 +81,7 @@ public class GameSpeedButtons : MonoBehaviour
     {
         if (pauseButtonText != null)
         {
-            pauseButtonText.text = isPaused ? ">" : "||";
+            pauseButtonText.text = isPaused ? "Play" : "Pause";
         }
     }
-} 
+}

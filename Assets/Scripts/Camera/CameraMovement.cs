@@ -36,28 +36,25 @@ public class CameraMovement : MonoBehaviour
         inputActions = new InputSystem_Actions();
         cam = Camera.main;
 
-        // If virtual camera is not assigned, try to find it
         if (virtualCamera == null)
         {
             virtualCamera = FindFirstObjectByType<CinemachineCamera>();
         }
 
-        // Get or add CinemachineConfiner2D component
         if (virtualCamera != null && confiner == null)
         {
             confiner = virtualCamera.GetComponent<CinemachineConfiner2D>();
         }
 
-        // Get the bounding shape from the confiner
         if (confiner != null)
         {
             boundingShape = confiner.BoundingShape2D;
         }
 
-        // Use the transform this script is attached to as the camera rig
-        cameraTransform = transform;
+        // Use the parent transform as the camera rig if available
+        cameraTransform = transform.parent != null ? transform.parent : transform;
 
-        // Set the virtual camera to follow this transform
+        // Set the virtual camera to follow the parent (moving object)
         if (virtualCamera != null)
         {
             virtualCamera.Follow = cameraTransform;
@@ -84,6 +81,7 @@ public class CameraMovement : MonoBehaviour
 
     void Update()
     {
+         
         HandleKeyboardMovement();
         HandleEdgeScrolling();
         HandleMouseDrag();

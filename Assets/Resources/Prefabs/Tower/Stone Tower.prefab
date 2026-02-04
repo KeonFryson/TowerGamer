@@ -170,41 +170,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
   range: 4
-  fireRate: 1
+  baseFireRate: 1
+  fireRateBonus: 0
   damage: 1
   cost: 250
+  baseProjectilesPerShot: 1
+  spreadAngle: 0
   upgradeTiers: 000000000000000000000000
   maxPathLevels: 050000000500000005000000
   upgradePaths:
   - upgrades:
-    - upgradeName: Range
-      description: UpgradeRange by 2
-      cost: 300
+    - upgradeName: Longer Range
+      description: Rocks can be cast from farther away.
+      cost: 100
       icon: {fileID: 0}
-      rangeBonus: 2
-      fireRateBonus: 0
+      rangeBonus: 3
+      fireRateBonus: 0.5
       damageBonus: 0
-    - upgradeName: More Shots
-      description: Add More Stones
-      cost: 400
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
+    - upgradeName: Stronger Rocks
+      description: Damage increases.
+      cost: 150
       icon: {fileID: 0}
       rangeBonus: 0
+      fireRateBonus: 0
+      damageBonus: 2
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
+    - upgradeName: Quick Cast
+      description: Faster spell release and small range boost.
+      cost: 550
+      icon: {fileID: -7846892096075038837, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
+      rangeBonus: 1
       fireRateBonus: 2
       damageBonus: 0
-    - upgradeName: All Stats Upgrade
-      description: 
-      cost: 500
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
+    - upgradeName: Boulder Launcher
+      description: Summons a dense boulder for tougher foes.
+      cost: 1500
       icon: {fileID: -7846892096075038837, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
-      rangeBonus: 3
-      fireRateBonus: 3
-      damageBonus: 3.05
-    - upgradeName: Path1_Upgrade4
-      description: 
-      cost: 500
-      icon: {fileID: -7846892096075038837, guid: 55f41ddf5bdcb464cb2b2d5c24393cd3, type: 3}
-      rangeBonus: 3
-      fireRateBonus: 3
-      damageBonus: 3
+      rangeBonus: 1
+      fireRateBonus: 2
+      damageBonus: 4
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
   - upgrades:
     - upgradeName: Path2_Upgrade1
       description: 
@@ -213,6 +224,8 @@ MonoBehaviour:
       rangeBonus: 1
       fireRateBonus: 1
       damageBonus: 1
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
     - upgradeName: Path2_Upgrade2
       description: 
       cost: 400
@@ -220,6 +233,8 @@ MonoBehaviour:
       rangeBonus: 2
       fireRateBonus: 2
       damageBonus: 2
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
     - upgradeName: Path3_Upgrade3
       description: 
       cost: 500
@@ -227,6 +242,8 @@ MonoBehaviour:
       rangeBonus: 3
       fireRateBonus: 3
       damageBonus: 3
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
     - upgradeName: Path4_Upgrade4
       description: 
       cost: 500
@@ -234,6 +251,8 @@ MonoBehaviour:
       rangeBonus: 3
       fireRateBonus: 3
       damageBonus: 3
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
   - upgrades:
     - upgradeName: Path4_Upgrade1
       description: 
@@ -242,6 +261,8 @@ MonoBehaviour:
       rangeBonus: 1
       fireRateBonus: 1
       damageBonus: 1
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
     - upgradeName: Path4_Upgrade2
       description: 
       cost: 400
@@ -249,6 +270,8 @@ MonoBehaviour:
       rangeBonus: 2
       fireRateBonus: 2
       damageBonus: 2
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
     - upgradeName: Path4_Upgrade3
       description: 
       cost: 500
@@ -256,6 +279,8 @@ MonoBehaviour:
       rangeBonus: 3
       fireRateBonus: 3
       damageBonus: 3
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
     - upgradeName: Path4_Upgrade4
       description: 
       cost: 500
@@ -263,7 +288,9 @@ MonoBehaviour:
       rangeBonus: 3
       fireRateBonus: 3
       damageBonus: 3
-  targetMode: 0
+      projectilesPerShotBonus: 0
+      spreadAngleBonus: 0
+  targetMode: 4
   spriteRenderer: {fileID: 0}
   projectileSpawnPoint: {fileID: 4301800600064697111}
   projectilePrefab: {fileID: 3979499744210860842, guid: 2642cfe071042bd498ac389466ecf935, type: 3}

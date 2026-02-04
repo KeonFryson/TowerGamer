@@ -12,9 +12,11 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float timeBetweenWaves = 5f;
     [SerializeField] private float timeBetweenEnemies = 0.5f;
 
-    [Header("Wave Progression")]
-    [SerializeField] private int baseEnemiesPerWave = 5;
-    [SerializeField] private float enemyIncreasePerWave = 1.5f;
+    [Header("Wave Points Formula")]
+    [SerializeField] private float startingWavePoints = 10f;
+    [SerializeField] private float waveLinearScale = 2.5f;
+    [SerializeField] private float waveQuadraticScale = 0.15f;
+
 
     private int currentWave = 0;
     private bool waveInProgress = false;
@@ -61,9 +63,10 @@ public class WaveManager : MonoBehaviour
                 GameManager.Instance.SetCurrentWave(currentWave);
             }
 
-            int enemyCount = Mathf.RoundToInt(baseEnemiesPerWave * Mathf.Pow(enemyIncreasePerWave, currentWave - 1));
+            // Generate wave using points budget and tier mixing
+            List<GameObject> waveEnemies = GenerateWave(currentWave);
 
-            yield return StartCoroutine(SpawnWave(enemyCount));
+            yield return StartCoroutine(SpawnWave(waveEnemies));
 
             // Wait until all enemies are defeated before starting the next wave
             while (enemiesAlive > 0)
@@ -77,62 +80,108 @@ public class WaveManager : MonoBehaviour
         }
     }
 
-    private IEnumerator SpawnWave(int enemyCount)
+    // Wave points formula
+    private float GetWavePoints(int wave)
     {
-        // Determine main and previous tier for this wave
-        EnemyTier mainTier = EnemyTierHelper.GetTierByWave(currentWave);
-        EnemyTier prevTier = EnemyTier.Baby;
-        if ((int)mainTier > 0)
-            prevTier = (EnemyTier)((int)mainTier - 1);
-
-        // Calculate percentage of main tier (e.g., 10% at start of new tier, 100% at end)
-        float tierProgress = EnemyTierHelper.GetTierProgress(currentWave);
-        int mainTierCount = Mathf.RoundToInt(enemyCount * tierProgress);
-        int prevTierCount = enemyCount - mainTierCount;
-
-        // Build spawn list
-        List<EnemyTier> spawnTiers = new List<EnemyTier>();
-        spawnTiers.AddRange(Enumerable.Repeat(mainTier, mainTierCount));
-        spawnTiers.AddRange(Enumerable.Repeat(prevTier, prevTierCount));
-
-        // Shuffle spawnTiers for randomness
-        for (int i = 0; i < spawnTiers.Count; i++)
-        {
-            int j = Random.Range(i, spawnTiers.Count);
-            var temp = spawnTiers[i];
-            spawnTiers[i] = spawnTiers[j];
-            spawnTiers[j] = temp;
-        }
-
-        // Spawn enemies by tier
-        foreach (var tier in spawnTiers)
-        {
-            SpawnEnemyOfTier(tier);
-            yield return new WaitForSeconds(timeBetweenEnemies);
-        }
+        return startingWavePoints + (wave * waveLinearScale) + (wave * wave * waveQuadraticScale);
     }
 
-    private void SpawnEnemyOfTier(EnemyTier tier)
+    // Tier mixing ratios
+    private Dictionary<EnemyTier, float> GetTierRatios(int wave)
     {
-        if (enemyPrefabs != null && enemyPrefabs.Count > 0 && PathManager.Instance != null)
+        if (wave < 5)
+            return new() { { EnemyTier.Baby, 1f } };
+        if (wave < 10)
+            return new() { { EnemyTier.Baby, 0.9f }, { EnemyTier.Weak, 0.1f } };
+        if (wave < 30)
+            return new() { { EnemyTier.Baby, 0.3f }, { EnemyTier.Weak, 0.4f }, { EnemyTier.Mid, 0.3f } };
+        if (wave < 50)
+            return new() { { EnemyTier.Baby, 0.1f }, { EnemyTier.Weak, 0.2f }, { EnemyTier.Mid, 0.4f }, { EnemyTier.Strong, 0.3f } };
+        if (wave < 80)
+            return new() { { EnemyTier.Baby, 0.05f }, { EnemyTier.Weak, 0.1f }, { EnemyTier.Mid, 0.25f }, { EnemyTier.Strong, 0.35f }, { EnemyTier.Elite, 0.25f } };
+        return new() { { EnemyTier.Baby, 0.05f }, { EnemyTier.Weak, 0.05f }, { EnemyTier.Mid, 0.15f }, { EnemyTier.Strong, 0.25f }, { EnemyTier.Elite, 0.25f }, { EnemyTier.Boss, 0.2f } };
+    }
+
+    // Generate a wave using points and tier mixing
+    public List<GameObject> GenerateWave(int wave)
+    {
+        float points = GetWavePoints(wave);
+        Debug.Log($"Generating wave {wave} with {points} points");
+        var ratios = GetTierRatios(wave);
+        Debug.Log($"Tier Ratios: {string.Join(", ", ratios.Select(kvp => $"{kvp.Key}: {kvp.Value}"))}");
+
+        // Group prefabs by tier
+        Dictionary<EnemyTier, List<GameObject>> tierPrefabs = new();
+        foreach (EnemyTier tier in System.Enum.GetValues(typeof(EnemyTier)))
         {
-            var tierPrefabs = enemyPrefabs
+            tierPrefabs[tier] = enemyPrefabs
                 .Where(p =>
                 {
                     Enemy enemy = p.GetComponent<Enemy>();
                     return enemy != null && enemy.Tier == tier;
                 })
                 .ToList();
+        }
 
-            // Fallback to all prefabs if none match the tier
-            var spawnList = tierPrefabs.Count > 0 ? tierPrefabs : enemyPrefabs;
+        List<GameObject> waveEnemies = new();
 
-            int index = Random.Range(0, spawnList.Count);
-            GameObject prefab = spawnList[index];
+        foreach (var kvp in ratios)
+        {
+            float tierPoints = points * kvp.Value;
+            var available = tierPrefabs[kvp.Key].Where(e => e != null).ToList();
 
-            Vector3 spawnPos = PathManager.Instance.GetWaypoint(0);
+            bool added = false;
+            while (tierPoints > 0 && available.Count > 0)
+            {
+                var prefab = available[Random.Range(0, available.Count)];
+                var enemy = prefab.GetComponent<Enemy>();
+                int cost = enemy != null ? enemy.Cost : 1;
+                if (tierPoints >= cost)
+                {
+                    waveEnemies.Add(prefab);
+                    tierPoints -= cost;
+                    added = true;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // Always add at least one from this tier if possible
+            if (!added && available.Count > 0)
+            {
+                var cheapest = available.OrderBy(e => e.GetComponent<Enemy>().Cost).First();
+                waveEnemies.Add(cheapest);
+            }
+        }
+
+        // Shuffle for randomness
+        for (int i = 0; i < waveEnemies.Count; i++)
+        {
+            int j = Random.Range(i, waveEnemies.Count);
+            var temp = waveEnemies[i];
+            waveEnemies[i] = waveEnemies[j];
+            waveEnemies[j] = temp;
+        }
+
+        return waveEnemies;
+    }
+
+    // Spawn the generated wave
+    private IEnumerator SpawnWave(List<GameObject> waveEnemies)
+    {
+        foreach (var prefab in waveEnemies)
+        {
+            Vector3 spawnPos = PathManager.Instance != null ? PathManager.Instance.GetWaypoint(0) : Vector3.zero;
             Instantiate(prefab, spawnPos, Quaternion.identity);
             enemiesAlive++;
+
+            // Log the cost of each enemy spawned
+            var enemy = prefab.GetComponent<Enemy>();
+            int cost = enemy != null ? enemy.Cost : 1;
+            Debug.Log($"Spawned enemy: {prefab.name}, Cost: {cost}");
+
+            yield return new WaitForSeconds(timeBetweenEnemies);
         }
     }
 

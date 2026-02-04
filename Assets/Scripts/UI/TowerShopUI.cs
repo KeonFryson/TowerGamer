@@ -1,6 +1,7 @@
+using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class TowerShopUI : MonoBehaviour
 {
@@ -43,6 +44,8 @@ public class TowerShopUI : MonoBehaviour
         {
             GameManager.Instance.OnMoneyChanged.AddListener(OnMoneyChanged);
         }
+
+        
     }
 
     private void SetupButtons()

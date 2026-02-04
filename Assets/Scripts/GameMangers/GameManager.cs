@@ -23,11 +23,9 @@ public class GameManager : MonoBehaviour
     private int currentSpeedIndex = 0;
     public UnityEvent<float> OnGameSpeedChanged;
 
-    // --- Pause Support ---
     private bool isPaused = false;
     private float previousTimeScale = 1f;
     public UnityEvent<bool> OnPauseStateChanged;
-    // ---------------------
 
     private void Awake()
     {
@@ -43,8 +41,6 @@ public class GameManager : MonoBehaviour
 
         currentMoney = startingMoney;
         currentLives = startingLives;
-
-        // Set default game speed
         SetGameSpeed(0);
     }
 
@@ -94,21 +90,10 @@ public class GameManager : MonoBehaviour
         Debug.Log("Game Over!");
     }
 
-    public int GetWave()
-    {
-        return currentWave;
-    }
-    public int GetMoney()
-    {
-        return currentMoney;
-    }
+    public int GetWave() => currentWave;
+    public int GetMoney() => currentMoney;
+    public int GetLives() => currentLives;
 
-    public int GetLives()
-    {
-        return currentLives;
-    }
-
-    // --- Game Speed Methods ---
     public void SetGameSpeed(int speedIndex)
     {
         if (isPaused)
@@ -126,12 +111,8 @@ public class GameManager : MonoBehaviour
         OnGameSpeedChanged?.Invoke(gameSpeeds[speedIndex]);
     }
 
-    public float GetCurrentGameSpeed()
-    {
-        return gameSpeeds[currentSpeedIndex];
-    }
+    public float GetCurrentGameSpeed() => gameSpeeds[currentSpeedIndex];
 
-    // --- Pause Methods ---
     public void TogglePause()
     {
         if (isPaused)
@@ -165,8 +146,5 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool IsPaused()
-    {
-        return isPaused;
-    }
+    public bool IsPaused() => isPaused;
 }

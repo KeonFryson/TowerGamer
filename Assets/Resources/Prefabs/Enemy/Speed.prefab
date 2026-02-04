@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 530420310578945068}
   - component: {fileID: -2868674830641408984}
   m_Layer: 0
-  m_Name: Speed Enemy
+  m_Name: Speed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -106,8 +106,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   moveSpeed: 5
-  health: 5
-  moneyReward: 20
+  health: 1
+  moneyReward: 2
   damage: 2
   cost: 5
   tier: 1

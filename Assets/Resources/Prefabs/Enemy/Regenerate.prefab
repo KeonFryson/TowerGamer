@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 530420310578945068}
   - component: {fileID: -2868674830641408984}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Regenerate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.14145018, g: 0.13843897, b: 0.16037738, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -106,11 +106,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   moveSpeed: 3
-  health: 1
-  moneyReward: 10
-  damage: 1
-  cost: 1
-  tier: 0
+  health: 5
+  moneyReward: 4
+  damage: 2
+  cost: 5
+  tier: 3
   spriteRenderer: {fileID: 9070140444926101078}
 --- !u!58 &-2868674830641408984
 CircleCollider2D:

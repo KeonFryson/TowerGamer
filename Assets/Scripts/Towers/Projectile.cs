@@ -30,6 +30,12 @@ public class Projectile : MonoBehaviour
         // No need to set moveDirection here; it's always set in SetTarget
     }
 
+    public void SetInitialDirection(Vector3 direction)
+    {
+        moveDirection = direction.normalized;
+    }
+
+
     private void Update()
     {
         lifetime += Time.deltaTime;

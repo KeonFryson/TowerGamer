@@ -64,8 +64,6 @@ public class PathManager : MonoBehaviour
                         Vector3 from = node.position;
                         Vector3 to = pathMapData.nodes[nextIndex].position;
                         Gizmos.DrawLine(from, to);
-
-                        // Draw arrowhead
                         DrawArrowHead(from, to, 0.3f, 20f);
                     }
                 }
@@ -73,9 +71,6 @@ public class PathManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Draws an arrowhead at the end of a line from 'from' to 'to'.
-    /// </summary>
     private void DrawArrowHead(Vector3 from, Vector3 to, float arrowHeadLength, float arrowHeadAngle)
     {
         Vector3 direction = (to - from).normalized;
